@@ -43,7 +43,7 @@ def dateInRange(t) :
     return True
  
 
-# 日打卡记录
+# checkin records
 class Record : 
     name = ""
     date = ""
@@ -57,8 +57,13 @@ class Record :
     def updateWorktime(self):
         if self.checkout != "" : 
             checkoutTime = datetime.fromisoformat(self.checkout)
+            checkinTime  = datetime.fromisoformat(self.checkin)
             overworkTime = datetime.fromisoformat(checkoutTime.date().isoformat() + " 19:30:00")
-            overworkCount = checkoutTime.timestamp() - overworkTime.timestamp()
+            #Satday Sunday count all time  
+            if(checkoutTime.weekday == 5 or checkoutTime.weekday == 6):
+                overworkCount = checkoutTime.timestamp() - checkinTime.timestamp()
+            else:
+                overworkCount = checkoutTime.timestamp() - overworkTime.timestamp()
             if overworkCount < 0 :
                 self.worktime = 0
             else : 
@@ -88,7 +93,7 @@ personRecords = {}
 row = 3 
 col = 0
 
-# 匹配上下班记录
+# match records
 while  row < detail.nrows :
     #col = 0
     #while col < detail.ncols : 
@@ -129,7 +134,7 @@ while  row < detail.nrows :
 print( "- " + str(row - 3)+" rows processed")
 
 
-# 数据过滤
+# data filter
 recordsCopy = copy.copy(records)
 keys = recordsCopy.keys()
 for  k in keys: 
@@ -140,7 +145,9 @@ for  k in keys:
 
 print("- date filter "+ str(dateStart) + " to " + str(dateEnd))
 
-# 统计
+
+
+# stat
 for r in records.values() :
     r.updateWorktime()
     key = r.name
@@ -159,7 +166,7 @@ for r in records.values() :
 # for r in personRecords.values() :
 #     print(r.name + ",t="+str(r.total) + ",tc=" + str(r.totalCount))
 
-## 排序
+## order
 keys = sorted(records.keys())
 
 
